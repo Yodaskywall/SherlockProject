@@ -15,10 +15,11 @@ class Tokenizer:
         self.vocab = {}
 
     def set_special_tokens(self, vocab_size):
-        self.vocab_size = vocab_size + 3
+        self.vocab_size = vocab_size + 4
         self.cls_token = vocab_size
         self.sep_token = vocab_size + 1
         self.pad_token = vocab_size + 2
+        self.mask_token = vocab_size + 3
 
 
     def train(self, text, vocab_size, verbose=False, save=False):

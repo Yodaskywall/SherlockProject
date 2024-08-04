@@ -106,7 +106,7 @@ class Encoder(nn.Module):
     def __init__(self, vocab_size, n_heads, n_embd, max_length, n_layers, dropout, device=None):
         super().__init__()
         self.embedding = Embedding(vocab_size, n_embd, max_length, device)
-        self.blocks = [Block(n_heads, n_embd, dropout, device) for i in range(n_layers)]
+        self.blocks = nn.Sequential(*[Block(n_heads, n_embd, dropout, device) for i in range(n_layers)])
         self.layerNorm = nn.LayerNorm(n_embd, device=device)
 
 
