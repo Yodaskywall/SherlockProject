@@ -8,13 +8,22 @@ class Tokenizer:
     def __init__(self):
         self.pattern = re.compile(self.REG_PAT)
         self.vocab_size = 0
+        self.cls_token = -1
+        self.sep_token = -1
+        self.pad_token = -1
         self.merges = {}
         self.vocab = {}
+
+    def set_special_tokens(self, vocab_size):
+        self.vocab_size = vocab_size + 3
+        self.cls_token = vocab_size
+        self.sep_token = vocab_size + 1
+        self.pad_token = vocab_size + 2
 
 
     def train(self, text, vocab_size, verbose=False, save=False):
         assert vocab_size >= 256
-        self.vocab_size = vocab_size
+        self.set_special_tokens(vocab_size)
         n_merges = vocab_size - 256
 
         text_chunks = re.findall(self.pattern, text)
@@ -72,6 +81,7 @@ class Tokenizer:
     def load_model(self, filename):
         with open(filename, "rb") as file:
             self.merges, self.vocab = pickle.load(file)
+        self.set_special_tokens(len(self.vocab))
 
 
     # ----------------------------------------------------------
