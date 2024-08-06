@@ -1,26 +1,34 @@
 import regex as re
+import tiktoken
 import pickle
 
 class Tokenizer:
-    """ Tokenizer that works with BPE, first dividing text according to a regex pattern """
-    REG_PAT = r"""'(?i:[sdmt]|ll|ve|re)|[^\r\n\p{L}\p{N}]?+\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]++[\r\n]*|\s*[\r\n]|\s+(?!\S)|\s+"""
+    """ Uses tiktokenizer """
     
     def __init__(self):
-        self.pattern = re.compile(self.REG_PAT)
-        self.vocab_size = 0
-        self.cls_token = -1
-        self.sep_token = -1
-        self.pad_token = -1
-        self.merges = {}
-        self.vocab = {}
+        self.encoding = tiktoken.get_encoding("cl100k_base")
+        self.vocab_size = self.encoding.max_token_value + 5
+        self.cls_token = self.encoding.max_token_value + 1
+        self.sep_token = self.encoding.max_token_value + 2
+        self.pad_token = self.encoding.max_token_value + 3
+        self.mask_token = self.encoding.max_token_value + 4
 
+
+    def encode(self, text):
+        return self.encoding.encode(text)
+
+    def decode(self, tokens):
+        return self.encoding.decode(tokens)
+
+    
+
+""" FROM OLD TOKENIZER:
     def set_special_tokens(self, vocab_size):
         self.vocab_size = vocab_size + 4
         self.cls_token = vocab_size
         self.sep_token = vocab_size + 1
         self.pad_token = vocab_size + 2
         self.mask_token = vocab_size + 3
-
 
     def train(self, text, vocab_size, verbose=False, save=False):
         assert vocab_size >= 256
@@ -55,10 +63,10 @@ class Tokenizer:
         tokens = [token for chunk in token_chunks for token in chunk]
 
         if save:
-            with open("data/tokeniser_data/encoded_text.pickle", "wb") as file:
+            with open("data/tokenizer_data/encoded_text.pickle", "wb") as file:
                 pickle.dump(tokens, file, protocol=pickle.DEFAULT_PROTOCOL)
 
-            with open("data/tokeniser_data/tokenizer_data.pickle", "wb") as file:
+            with open("data/tokenizer_data/tokenizer_data.pickle", "wb") as file:
                 pickle.dump((self.merges, self.vocab), file, protocol=pickle.DEFAULT_PROTOCOL)
 
         return self.merges, self.vocab, tokens
@@ -133,8 +141,10 @@ class Tokenizer:
 
 
 if __name__ == "__main__":
-    with open("data/train.csv", encoding="utf-8") as file:
+    with open("data/allbooks.txt", encoding="utf-8") as file:
         text = file.read()
 
     tok = Tokenizer()
-    merges, vocab, encoding = tok.train(text, 5000, True, True)
+    merges, vocab, encoding = tok.train(text, 260, True, True)
+    print(vocab)
+"""
