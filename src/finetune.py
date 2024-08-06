@@ -103,8 +103,6 @@ def estimate_loss(eval_iters=EVAL_ITERS):
     model.train()
     return out
 
-estimate_loss()
-
 # Create optimizer
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
 
