@@ -21,7 +21,7 @@ DROPOUT = 0.2
 LR = 1e-05
 TRAINING_STEPS = 8000
 EVAL_INTERVAL = 500
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 EVAL_ITERS = 150
 
 
@@ -35,10 +35,10 @@ print(sum(p.numel() for p in model.parameters()))
 model = model.to(DEVICE)
 
 # Load data
-with open("data/processed_train.pickle", "rb") as file:
+with open("data/allbooks.pickle", "rb") as file:
     text = pickle.load(file)
 
-text = torch.tensor(text, device=DEVICE)
+text = torch.tensor(text)
 
 # Train-validation split
 n = int(0.9*len(text))
@@ -92,19 +92,20 @@ def get_batch(text):
     STD = 16
 
     # Generates random sentence lengths
-    sentence_lengths = torch.round(torch.abs((STD * torch.randn(BATCH_SIZE)) + MEAN))
-    max_batch_length = torch.max(sentence_lengths)
+    sentence_lengths = torch.round(torch.abs((STD * torch.randn(BATCH_SIZE)) + MEAN)).long()
+    max_batch_length = torch.max(sentence_lengths).item()
 
     # Generates random indicies
     ixs = torch.randint(len(text) - max_batch_length, (BATCH_SIZE,))
 
     # Fetches sentences, and pads them
-    sentences = torch.stack([F.pad(text[ ix : ix + sentence_lengths[ix] ], (0, MAX_LENGTH - sentence_lengths[ix]),
-                              value=tokenizer.pad_token) for ix in ixs])
+    sentences = torch.stack([F.pad(text[ ix : ix + sentence_lengths[i] ], (0, MAX_LENGTH - sentence_lengths[i]),
+                              value=tokenizer.pad_token) for i,ix in enumerate(ixs)])
 
     # Creates all-zeros segments
     # Not sure segments are needed for pre-training phase
-    segments = torch.zeros_like(sentences)
+    segments = torch.zeros_like(sentences, device=DEVICE)
+    sentences = sentences.to(DEVICE)
 
     return sentences, segments
 
