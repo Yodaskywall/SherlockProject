@@ -1,6 +1,4 @@
-import regex as re
 import tiktoken
-import pickle
 
 class Tokenizer:
     """ Uses tiktokenizer """

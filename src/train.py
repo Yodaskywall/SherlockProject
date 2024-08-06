@@ -2,8 +2,6 @@ from bert import Bert
 import matplotlib.pyplot as plt
 import torch
 import pickle
-import math
-import random
 from tokenizer import Tokenizer
 from torch.nn import functional as F
 

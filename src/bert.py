@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from encoder import Encoder
-import pickle
 
 
 class Bert(nn.Module):
