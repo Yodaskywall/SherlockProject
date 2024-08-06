@@ -17,7 +17,7 @@ class Bert(nn.Module):
         self.n_embd = n_embd
         self.vocab_size = vocab_size
     
-    def forward(self, sentences, segments, mask, targets=None):
+    def forward(self, sentences, segments, mask=None, targets=None):
         """
         sentences -> (B, T)
         segments -> (B, T)
